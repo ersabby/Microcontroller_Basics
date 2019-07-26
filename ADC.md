@@ -29,11 +29,11 @@ Resolution can be improved by reducing the reference input. Changing that from 5
 
 The only way to increase resolution without reducing the range is to use an ADC with more bits. A 10-bit ADC has 210, or 1,024 possible output codes. So the resolution is 5V/1,024, or 4.88mV; a 12-bit ADC has a 1.22mV resolution for this same reference.
 
-Types of ADCs
+# Types of ADCs
 
 ADCs come in various speeds, use different interfaces, and provide differing degrees of accuracy. The most common types of ADCs are flash, successive approximation, and sigma-delta.
 
-Flash ADC
+# Flash ADC
 
 The flash ADC is the fastest type available. A flash ADC uses comparators, one per voltage step, and a string of resistors. A 4-bit ADC will have 16 comparators, an 8-bit ADC will have 256 comparators. All of the comparator outputs connect to a block of logic that determines the output based on which comparators are low and which are high.
 
@@ -41,11 +41,11 @@ The conversion speed of the flash ADC is the sum of the comparator delays and th
 
 A variation on the flash converter is the half-flash, which uses an internal digital-to-analog converter (DAC) and subtraction to reduce the number of internal comparators. Half-flash converters are slower than true flash converters but faster than other types of ADCs. We'll lump them into the flash converter category.
 
-Successive approximation converter
+# Successive approximation converter
 
 A successive approximation converter uses a comparator and counting logic to perform a conversion. The first step in the conversion is to see if the input is greater than half the reference voltage. If it is, the most significant bit (MSB) of the output is set. This value is then subtracted from the input, and the result is checked for one quarter of the reference voltage. This process continues until all the output bits have been set or reset. A successive approximation ADC takes as many clock cycles as there are output bits to perform a conversion.
 
-Sigma-delta
+# Sigma-delta
 
 A sigma-delta ADC uses a 1-bit DAC, filtering, and oversampling to achieve very accurate conversions. The conversion accuracy is controlled by the input reference and the input clock rate.
 
@@ -55,13 +55,13 @@ The primary disadvantage of the sigma-delta converter is speed. Because the conv
 
 Another disadvantage of the sigma-delta converter is the complexity of the digital filter that converts the duty cycle information to a digital output word. The sigma-delta converter has become more commonly available with the ability to add a digital filter or DSP to the IC die.
 
-ADC comparison
+# ADC comparison
 
 Figure 2shows the range of resolutions available for sigma-delta, successive approximation, and flash converters. The maximum conversion speed for each type is shown as well. As you can see, the speed of available sigma-delta ADCs reaches into the range of the successive approximation ADCs, but is not as fast as even the slowest flash ADCs. What the tables do not show is the tradeoff between speed and accuracy. For instance, while you can get successive approximation ADCs that range from 8 to 16 bits, you won't find the 16-bit version to be the fastest in a given family of parts. The fastest flash ADC won't be the 12-bit part, it will be a 6- or 8-bit part.
 
 These charts are a snapshot of the current state of the technology. As CMOS processes have improved, successive approximation conversion times have moved from tens of microseconds to microseconds. Not all technology improvements affect all types of converters; CMOS process improvements speed up all families of converters, but the ability to put increasingly sophisticated DSP functionality on the ADC chip doesn't improve successive approximation converters. DSP functionality does improve sigma-delta types because it enables better, faster, and more complex filters to be added to the part.
 
-Sample and hold
+# Sample and hold
 
 ADC operation is straightforward when a DC signal is being converted. But if the input signal varies by more than one least significant bit (LSB) during the conversion time, the ADC will produce an incorrect (or at least inaccurate) result. One way to reduce these errors is to place a low-pass filter ahead of the ADC. The filter parameters are selected to ensure that the ADC input does not change by more than one LSB within a conversion cycle.
 
@@ -89,7 +89,7 @@ After the S/H is placed into hold mode, another bit (or a write to an address or
 
 Software must also accommodate the charge time of the S/H. When the electronic switch closes and connects the input signal to the S/H capacitor, it takes a finite amount of time for the capacitor to charge because the switch and whatever source is driving the input both have nonzero impedances. If the sum of these impedances is large enough, the software may need to add a delay so the hold capacitor has time to charge to within one LSB of the final value before starting the conversion.
 
-Internal microcontroller ADCs
+# Internal microcontroller ADCs
 
 Many microcontrollers contain on-chip ADCs. Typical devices include the Microchip PIC167C7xx family and the Atmel AT90S4434. Most microcontroller ADCs are successive approximation because this gives the best tradeoff between speed and the cost of real estate on the microcontroller die.
 
