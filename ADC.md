@@ -5,7 +5,7 @@ In analog-to-digital converter (ADC) accepts an analog input-a voltage or a curr
 
 ![Fig1 SimpleADC](https://user-images.githubusercontent.com/51851040/61939756-99727c80-afb1-11e9-87fc-03e2515706a8.gif)
 
-    Figure 1shows a simple voltage-input ADC.
+    Figure 1 shows a simple voltage-input ADC.
 This hypothetical part has two inputs: a reference and the signal to be measured. It has one output, an 8-bit digital word that represents the input value.
 
 The reference voltage is the maximum value that the ADC can convert. Our example 8-bit ADC can convert values from 0V to the reference voltage. This voltage range is divided into 256 values, or steps. The size of the step is given by:
@@ -74,10 +74,11 @@ These charts are a snapshot of the current state of the technology. As CMOS proc
 ADC operation is straightforward when a DC signal is being converted. But if the input signal varies by more than one least significant bit (LSB) during the conversion time, the ADC will produce an incorrect (or at least inaccurate) result. One way to reduce these errors is to place a low-pass filter ahead of the ADC. The filter parameters are selected to ensure that the ADC input does not change by more than one LSB within a conversion cycle.
 
 Another way to handle changing inputs is to add a sample-and-hold (S/H) circuit ahead of the ADC.
+In electronics, a sample and hold circuit is an analog device that samples the voltage of a continuously varying analog signal and holds its value at a constant level for a specified minimum period of time. Sample and hold circuits and related peak detectors are the elementary analog memory devices. 
 
 ![Fig3 S H_Circuit](https://user-images.githubusercontent.com/51851040/61940557-50bbc300-afb3-11e9-86dc-2290a202fcb8.gif)
 
-    Figure 3shows how a sample-and-hold circuit works. The S/H circuit has an analog (solid state) switch with a control input. When the switch is closed, the input signal is connected to the hold capacitor and the output of the buffer follows the input. When the switch is open, the input is disconnected from the capacitor.
+    Figure 3 shows how a sample-and-hold circuit works. The S/H circuit has an analog (solid state) switch with a control input. When the switch is closed, the input signal is connected to the hold capacitor and the output of the buffer follows the input. When the switch is open, the input is disconnected from the capacitor.
 
 The figure shows the waveform for S/H operation. A slowly rising signal is connected to the S/H input. While the control signal is low (sample), the output follows the input. When the control signal goes high (hold), disconnecting the hold capacitor from the input, the output stays at the value the input had when the S/H switched to hold mode. When the switch closes again, the capacitor charges quickly and the output again follows the input. Typically, the S/H will be switched to hold mode just before the ADC conversion starts, and switched back to sample mode after the conversion is complete.
 
@@ -143,7 +144,7 @@ The variation in the reference voltage from part to part can result in an output
 
 ![Fig4ReferenceVoltVar](https://user-images.githubusercontent.com/51851040/61940209-8f04b280-afb2-11e9-9eb2-9671cc102a68.gif)
 
-		Figure 4shows the effect a reference variation has on the ADC result.
+		Figure 4 shows the effect a reference variation has on the ADC result.
 Although the percentage of error stays the same throughout the range, the numerical error is of course greater for larger ADC values.
 
 Software calibration
