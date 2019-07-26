@@ -145,3 +145,4 @@ Software calibration
 
 Sometimes you need an accurate reference, more accurate than the product cost will support. When manual adjustment is out of the question, the software can compensate for reference voltage variations. This is typically done by providing a known, precise input, which is used to calibrate the ADC. This reference can be very precise (and very expensive) because only a few are needed for the production line.
 
+Ref:https://www.eetimes.com/document.asp?doc_id=1276974#
