@@ -2,6 +2,7 @@
 The usual method of bringing analog inputs into a microprocessor is to use an analog-to-digital converter (ADC). Here are some tips for selecting such a part and calibrating it to fit your needs.
 
 In analog-to-digital converter (ADC) accepts an analog input-a voltage or a current-and converts it to a digital value that can be read by a microprocessor.
+
 ![Fig1 SimpleADC](https://user-images.githubusercontent.com/51851040/61939756-99727c80-afb1-11e9-87fc-03e2515706a8.gif)
 
     Figure 1shows a simple voltage-input ADC.
@@ -60,6 +61,7 @@ The primary disadvantage of the sigma-delta converter is speed. Because the conv
 Another disadvantage of the sigma-delta converter is the complexity of the digital filter that converts the duty cycle information to a digital output word. The sigma-delta converter has become more commonly available with the ability to add a digital filter or DSP to the IC die.
 
 # ADC comparison
+
 ![adcComp](https://user-images.githubusercontent.com/51851040/61937061-a8563080-afab-11e9-8889-c6e5db93078d.gif)
 
     Figure 2 shows the range of resolutions available for sigma-delta, successive approximation, and flash converters.
@@ -72,6 +74,8 @@ These charts are a snapshot of the current state of the technology. As CMOS proc
 ADC operation is straightforward when a DC signal is being converted. But if the input signal varies by more than one least significant bit (LSB) during the conversion time, the ADC will produce an incorrect (or at least inaccurate) result. One way to reduce these errors is to place a low-pass filter ahead of the ADC. The filter parameters are selected to ensure that the ADC input does not change by more than one LSB within a conversion cycle.
 
 Another way to handle changing inputs is to add a sample-and-hold (S/H) circuit ahead of the ADC.
+
+![Fig3 S H_Circuit](https://user-images.githubusercontent.com/51851040/61940557-50bbc300-afb3-11e9-86dc-2290a202fcb8.gif)
 
     Figure 3shows how a sample-and-hold circuit works. The S/H circuit has an analog (solid state) switch with a control input. When the switch is closed, the input signal is connected to the hold capacitor and the output of the buffer follows the input. When the switch is open, the input is disconnected from the capacitor.
 
@@ -136,6 +140,7 @@ At Vref= 2.53V,
 Result = (2V x 1,024)/2.53 = 80910
 
 The variation in the reference voltage from part to part can result in an output variation of 20 counts.
+
 ![Fig4ReferenceVoltVar](https://user-images.githubusercontent.com/51851040/61940209-8f04b280-afb2-11e9-9eb2-9671cc102a68.gif)
 
 		Figure 4shows the effect a reference variation has on the ADC result.
