@@ -12,7 +12,7 @@ The reference voltage is the maximum value that the ADC can convert. Our example
 
 Vref/256
 
-where Vrefis the reference voltage. The step size of the converter defines the converter's resolution. For a 5V reference, the step size is:
+where Vref is the reference voltage. The step size of the converter defines the converter's resolution. For a 5V reference, the step size is:
 
 5V/256 = 0.0195V or 19.5mV
 
