@@ -1,7 +1,10 @@
 # ADC
 The usual method of bringing analog inputs into a microprocessor is to use an analog-to-digital converter (ADC). Here are some tips for selecting such a part and calibrating it to fit your needs.
 
-In analog-to-digital converter (ADC) accepts an analog input-a voltage or a current-and converts it to a digital value that can be read by a microprocessor. Figure 1shows a simple voltage-input ADC. This hypothetical part has two inputs: a reference and the signal to be measured. It has one output, an 8-bit digital word that represents the input value.
+In analog-to-digital converter (ADC) accepts an analog input-a voltage or a current-and converts it to a digital value that can be read by a microprocessor.
+![Fig1 SimpleADC](https://user-images.githubusercontent.com/51851040/61939756-99727c80-afb1-11e9-87fc-03e2515706a8.gif)
+
+    Figure 1shows a simple voltage-input ADC. This hypothetical part has two inputs: a reference and the signal to be measured. It has one output, an 8-bit digital word that represents the input value.
 
 The reference voltage is the maximum value that the ADC can convert. Our example 8-bit ADC can convert values from 0V to the reference voltage. This voltage range is divided into 256 values, or steps. The size of the step is given by:
 
@@ -57,7 +60,8 @@ Another disadvantage of the sigma-delta converter is the complexity of the digit
 
 # ADC comparison
 ![adcComp](https://user-images.githubusercontent.com/51851040/61937061-a8563080-afab-11e9-8889-c6e5db93078d.gif)
-Figure 2 shows the range of resolutions available for sigma-delta, successive approximation, and flash converters. The maximum conversion speed for each type is shown as well. As you can see, the speed of available sigma-delta ADCs reaches into the range of the successive approximation ADCs, but is not as fast as even the slowest flash ADCs. What the tables do not show is the tradeoff between speed and accuracy. For instance, while you can get successive approximation ADCs that range from 8 to 16 bits, you won't find the 16-bit version to be the fastest in a given family of parts. The fastest flash ADC won't be the 12-bit part, it will be a 6- or 8-bit part.
+
+    Figure 2 shows the range of resolutions available for sigma-delta, successive approximation, and flash converters. The maximum conversion speed for each type is shown as well. As you can see, the speed of available sigma-delta ADCs reaches into the range of the successive approximation ADCs, but is not as fast as even the slowest flash ADCs. What the tables do not show is the tradeoff between speed and accuracy. For instance, while you can get successive approximation ADCs that range from 8 to 16 bits, you won't find the 16-bit version to be the fastest in a given family of parts. The fastest flash ADC won't be the 12-bit part, it will be a 6- or 8-bit part.
 
 These charts are a snapshot of the current state of the technology. As CMOS processes have improved, successive approximation conversion times have moved from tens of microseconds to microseconds. Not all technology improvements affect all types of converters; CMOS process improvements speed up all families of converters, but the ability to put increasingly sophisticated DSP functionality on the ADC chip doesn't improve successive approximation converters. DSP functionality does improve sigma-delta types because it enables better, faster, and more complex filters to be added to the part.
 
@@ -65,7 +69,9 @@ These charts are a snapshot of the current state of the technology. As CMOS proc
 
 ADC operation is straightforward when a DC signal is being converted. But if the input signal varies by more than one least significant bit (LSB) during the conversion time, the ADC will produce an incorrect (or at least inaccurate) result. One way to reduce these errors is to place a low-pass filter ahead of the ADC. The filter parameters are selected to ensure that the ADC input does not change by more than one LSB within a conversion cycle.
 
-Another way to handle changing inputs is to add a sample-and-hold (S/H) circuit ahead of the ADC. Figure 3shows how a sample-and-hold circuit works. The S/H circuit has an analog (solid state) switch with a control input. When the switch is closed, the input signal is connected to the hold capacitor and the output of the buffer follows the input. When the switch is open, the input is disconnected from the capacitor.
+Another way to handle changing inputs is to add a sample-and-hold (S/H) circuit ahead of the ADC.
+
+    Figure 3shows how a sample-and-hold circuit works. The S/H circuit has an analog (solid state) switch with a control input. When the switch is closed, the input signal is connected to the hold capacitor and the output of the buffer follows the input. When the switch is open, the input is disconnected from the capacitor.
 
 The figure shows the waveform for S/H operation. A slowly rising signal is connected to the S/H input. While the control signal is low (sample), the output follows the input. When the control signal goes high (hold), disconnecting the hold capacitor from the input, the output stays at the value the input had when the S/H switched to hold mode. When the switch closes again, the capacitor charges quickly and the output again follows the input. Typically, the S/H will be switched to hold mode just before the ADC conversion starts, and switched back to sample mode after the conversion is complete.
 
@@ -127,7 +133,10 @@ At Vref= 2.53V,
 
 Result = (2V x 1,024)/2.53 = 80910
 
-The variation in the reference voltage from part to part can result in an output variation of 20 counts. Figure 4shows the effect a reference variation has on the ADC result. Although the percentage of error stays the same throughout the range, the numerical error is of course greater for larger ADC values.
+The variation in the reference voltage from part to part can result in an output variation of 20 counts.
+![Fig4ReferenceVoltVar](https://user-images.githubusercontent.com/51851040/61940209-8f04b280-afb2-11e9-9eb2-9671cc102a68.gif)
+
+		Figure 4shows the effect a reference variation has on the ADC result. Although the percentage of error stays the same throughout the range, the numerical error is of course greater for larger ADC values.
 
 Software calibration
 
@@ -165,7 +174,12 @@ Calculating and using the calibration value
 
 The calibration value can be calculated by reading a known reference and then finding which correction factors (binary submultiples) to use. For the example given, the difference between the ideal and the worst-case ADC value will never be more than 1.2%, so there is no point in starting with one-half or one-fourth of the original value. The only values tested and used are 1/128, 1/256, and 1/512. You want to start with something close to the value you expect to see.
 
-Finding the correction factors is easy with a calculator, but if you have to calculate it on the fixed-point processor you will be using in your application, you need an integer-based approach. Figure 5shows in flowchart form the algorithm used in this example to calculate and use the calibration constant. In this method, a single byte (or word) is used to store the calibration constant. Bit 7 indicates whether the reference voltage is low (calibration values need to be subtracted) or high (calibration values added). Bits 0, 1, and 2 indicate whether the 1/128, 1/256, and 1/512 factors are used.
+Finding the correction factors is easy with a calculator, but if you have to calculate it on the fixed-point processor you will be using in your application, you need an integer-based approach.
+
+
+![Fig5Caliberation](https://user-images.githubusercontent.com/51851040/61940210-8f04b280-afb2-11e9-9821-b6156c1c24e0.gif)
+
+		Figure 5shows in flowchart form the algorithm used in this example to calculate and use the calibration constant. In this method, a single byte (or word) is used to store the calibration constant. Bit 7 indicates whether the reference voltage is low (calibration values need to be subtracted) or high (calibration values added). Bits 0, 1, and 2 indicate whether the 1/128, 1/256, and 1/512 factors are used.
 
 Of course, you could use a separate byte for each possible factor, with a fourth byte to indicate whether the reference is high or low.
 
