@@ -94,13 +94,7 @@ As mentioned, the electronic switch is imperfect and some of the input signal ap
 
 The output offset is the voltage difference between the input and the output. S/H circuit datasheets typically show a hold mode offset and sample mode offset in millivolts.
 
-Software
-
-An ADC system that uses a S/H may have to accommodate the hardware quirks. In some systems, the software directly controls the S/H control input with a port or register output bit. Typically, the S/H is placed into sample mode, and the software must ensure that the acquisition time requirement is met. In some systems, this can be accomplished simply by leaving the S/H in sample mode until a conversion is needed.
-
-After the S/H is placed into hold mode, another bit (or a write to an address or some other operation) starts the ADC. After the conversion is complete, the software reads the result. However, a problem may occur if any one interrupt (or a worst-case stackup of interrupts) causes the output of the S/H circuit to droop by more than one LSB. If this could happen, the software may need to disable interrupts before switching the S/H to hold mode and re-enable them after starting the conversion. This ensures that the ADC will complete the conversion before the S/H droop occurs.
-
-Software must also accommodate the charge time of the S/H. When the electronic switch closes and connects the input signal to the S/H capacitor, it takes a finite amount of time for the capacitor to charge because the switch and whatever source is driving the input both have nonzero impedances. If the sum of these impedances is large enough, the software may need to add a delay so the hold capacitor has time to charge to within one LSB of the final value before starting the conversion.
+Sample and Hold can also be done using software that will control the charge and discharge time of the capacitor
 
 # Internal microcontroller ADCs
 
@@ -151,66 +145,3 @@ Software calibration
 
 Sometimes you need an accurate reference, more accurate than the product cost will support. When manual adjustment is out of the question, the software can compensate for reference voltage variations. This is typically done by providing a known, precise input, which is used to calibrate the ADC. This reference can be very precise (and very expensive) because only a few are needed for the production line.
 
-In the 2.47V example we've been looking at, a precise voltage of 2V might be input to the ADC. When the software reads the ADC, it knows the correct value should be 819; the calibration constant is given by 829/819, or 1.012. Similarly, the calibration constant for the 2.53V reference is 809/819, or 0.988.
-
-This would seem to imply the need for floating-point math to correct the ADC value. If you are using a processor capable of floating-point, this is an acceptable approach. On simpler processors, though, you may not have the execution time or the code space available to implement floating-point calculations.
-
-One way to handle the ADC correction is to use a lookup table. This has the drawbacks of requiring sufficient nonvolatile storage to maintain a lookup value for every possible ADC value-a 1,024-word table for a 10-bit ADC.
-
-A voltage reference is fairly close to its nominal value-otherwise it would not be useful as a reference. Assuming that your reference is sufficiently stable over your operating temperature, the ADC error will be a constant percentage of the value you read from the ADC. Since the ADC has a finite resolution, there is no point in attempting to correct the ADC error with any precision greater than 1 LSB.
-
-Knowing this, you can simplify the ADC correction process. Instead of a lookup table, you store a value that tells the software what (binary) percentage to add or subtract from the ADC reading to correct the error. You can add or subtract 1/8, 1/16, or 1/24, all the way down to 1 LSB of accuracy. You only need to store a single calibration constant, and your division process consists of a series of shift-and-add or shift-and-subtract operations.
-
-The 2.47V example could be corrected by multiplying the ADC value by .988. The same thing can be achieved by subtracting 1/128 then 1/256 then 1/512 of the initial value. Using the original 2V input example, and doing this with integer math, we get the following:
-
-829 -- 829/128 -- 829/156 -- 829/512
-
-= 829 -- 6 -- 3 -- 1
-
-= 819
-
-This result corrects the ADC reading to 819, which is the ideal value if the reference were the nominal 2.5V. Similarly, values read with the 2.53V reference can be corrected by adding 1/128 plus 1/256.
-
-Note that you do not need to apply the precise calibration voltage to the input you are using. You can use any spare ADC input, so long as that ADC uses the reference you want to calibrate.
-
-You need to be sure that your reference is sufficiently stable over your expected operating temperature range or the results will only be good near the temperature during calibration. If the temperature stability of the reference is not good enough, you will have to get a better reference or break your operating temperature range into multiple segments and use one calibration value for each segment. Of course, this implies that you must have a thermistor or other means of measuring the temperature, too.
-
-This approach does result in rounding errors caused by the truncation that occurs when you shift the result. I made a spreadsheet using the 2.47V example, and in all cases the corrected value was within two counts of the ideal value. Most corrected values were exactly right or off by just one. This degree of correction is significantly better than the original variation (10 counts) for a 2V input, and is all that many applications require. If your application can't stand even this error, then you may really need a better reference or you may have to resort to a manual adjustment.
-
-This calibration technique can also be used to compensate for other system inaccuracies, such as resistor tolerance stackup. If whatever you are measuring consists of a voltage input, you can apply the precision voltage to that input and do one calibration to compensate for reference variations in the ADC and resistor tolerance effects in the input conditioning.
-
-Calculating and using the calibration value
-
-The calibration value can be calculated by reading a known reference and then finding which correction factors (binary submultiples) to use. For the example given, the difference between the ideal and the worst-case ADC value will never be more than 1.2%, so there is no point in starting with one-half or one-fourth of the original value. The only values tested and used are 1/128, 1/256, and 1/512. You want to start with something close to the value you expect to see.
-
-Finding the correction factors is easy with a calculator, but if you have to calculate it on the fixed-point processor you will be using in your application, you need an integer-based approach.
-
-
-![Fig5Caliberation](https://user-images.githubusercontent.com/51851040/61940210-8f04b280-afb2-11e9-9821-b6156c1c24e0.gif)
-
-		Figure 5 shows in flowchart form the algorithm used in this example to calculate and use the calibration constant. 
-In this method, a single byte (or word) is used to store the calibration constant. Bit 7 indicates whether the reference voltage is low (calibration values need to be subtracted) or high (calibration values added). Bits 0, 1, and 2 indicate whether the 1/128, 1/256, and 1/512 factors are used.
-
-Of course, you could use a separate byte for each possible factor, with a fourth byte to indicate whether the reference is high or low.
-
-Writing the calibration values
-
-Whether you use a table or a calibration constant, how do you get the calibration values into the system? A key component of any calibration scheme is the availability of nonvolatile storage. Many microcontrollers have on-chip EEPROM. Calibration is typically performed when the circuit board is tested. In a high volume production environment, this will probably be done by some kind of bed-of-nails automatic test equipment.
-
-You will typically want to put the processor into some kind of "calibration mode," possibly by grounding a pin. The production test equipment can be programmed to apply a very precise voltage to an analog input and ground the calibration pin. The microcontroller can then enter calibration mode, where it reads the reference value and calculates the compensation value or creates a lookup table.
-
-In some cases, you don't have sufficient memory to add the calibration code to the microcontroller. In this case, you can have the microcontroller return the ADC value to an output pin (serially) or to a group of pins (parallel), where it is read by the production test equipment. An external computer can then calculate the calibration or table values and return them to the microcontroller via the same interface.
-
-If the production equipment also programs the microcontroller in-circuit, the calibration data can be embedded into the data programmed into the flash memory. If the reference being calibrated is inside the microcontroller, the test equipment may have to first load a calibration program into the microcontroller, perform the calibration, then load the actual application code.
-
-Finally, some very small microcontrollers simply don't have enough pins to give any up for calibration. In this case, you can often make an output pin do double duty as a calibration pin. You pull the pin up with an external resistor. The production equipment grounds the pin prior to power-up to select calibration mode.
-
-The way this works is the microcontroller powers up with all the pins in the input state. It reads the calibration pin before configuring the pin as an output. If the pin is high, normal operation is started. If the pin is low, it must be externally grounded, so the microcontroller enters calibration mode. Of course, the output has to be one that won't damage anything when the pin is externally grounded.
-
-Finally, if you are calibrating the reference applying the precise voltage to a spare ADC input, you can use that input itself to put the system into calibration mode. Use a resistor to pull the spare input to the zero-scale ADC voltage (ground, in the examples we've been using). Then have the software enter calibration mode when a voltage over some predetermined threshold (say, two-thirds of the full-scale voltage) is detected on the pin.
-
-When selecting a calibration voltage, you want to choose the largest value that will not saturate the ADC when the reference voltage is at its lowest possible value. This ensures that you don't lose accuracy in calculating the calibration constant (or table) because of bit rounding errors. This will typically put the calibration voltage above 90% of the full scale value, although you may want to choose the nearest standard reference voltage to make the design easy.
-
-In some applications, you can get around the reference issue by looking for a change in the ADC input. You might be able to watch for an optical sensor to change by 10% instead of comparing it to a fixed value, or you might watch for a temperature to go down by 25%. Of course, the accuracy of the sensor enters into this as well, but that topic is beyond the scope of this article.
-
-Although it is sometimes difficult to know which ADC to use for your application, the wide array of parts available assures that you will find one to suit your needs. Matching the software to the hardware ensures that you will get the accuracy and reliability your product calls for.
